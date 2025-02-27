@@ -1,3 +1,8 @@
+<?php
+	if(isset($_SESSION)){ }else{ session_start(); }
+	//---------------------------------------------
+	
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
