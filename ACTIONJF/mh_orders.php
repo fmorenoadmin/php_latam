@@ -5,14 +5,14 @@
 	//-----------------------------------
 	$cls = array(
 		"dbs"	=>	'database',
-		"cl1"	=>	'usuarios',
+		"cl1"	=>	'mh_orders',
 	);
 	//-----------------------------------
 	$dt = array();$json = new stdClass();
 	//-----------------------------------
 	$_tbl = new stdClass();
 	$_tbl->tname = $cls['cl1'];
-	$_tbl->tid = 'id_user';
+	$_tbl->tid = 'id_order';
 	$_tbl->pid = 0;
 	$_tbl->test = true;
 	//-----------------------------------
@@ -47,7 +47,7 @@
 	if (isset($_POST['nuevo'])) {
 		require_once($ru0.'config/constant.php');
 		//----------------------------------------
-		$destino= __DIRIMG__."usuarios/";
+		$destino= __DIRIMG__."mh_orders/";
 		//----------------------------------------
 		if (isset($_SESSION['user_id'])) {
 			require($ru0.DIRMOR.$cls['dbs'].'.php');
@@ -111,7 +111,7 @@
 	if (isset($_POST['editar'])) {
 		require_once($ru0.'config/constant.php');
 		//----------------------------------------
-		$destino= __DIRIMG__."usuarios/";
+		$destino= __DIRIMG__."mh_orders/";
 		//----------------------------------------
 		if (isset($_SESSION['user_id'])) {
 			require($ru0.DIRMOR.$cls['dbs'].'.php');

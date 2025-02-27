@@ -2,16 +2,16 @@
 	/**
 	 * 
 	 */
-	class usuarios extends database
+	class mh_orders extends database
 	{
-		private $table	='usuarios';
+		private $table	='mh_orders';
 		private $table0	='';
-		private $table1	='tipos_usuarios';
+		private $table1	='';
 		private $table2	='';
-		private $actio	='usuarios.php';
+		private $actio	='mh_orders.php';
 		private $detail	='detalle/?p=';
-		private $tid	="id_user";
-		private $tid1	="id_tipo";
+		private $tid	="id_order";
+		private $tid1	="";
 		private $tid2	="";
 		//----------------------------------
 			function cantidad($rid){
@@ -73,14 +73,14 @@
 				//---------------------------------------------------------
 				$inf="";
 				//--------------------------------
-				$inf.='<option value="'.base64_encode(0).'">Seleccione al Cliente/Proveedor:</option>';
+				$inf.='<option value="'.base64_encode(0).'">Seleccione la Orden:</option>';
 				//--------------------------------
-				$sql = "SELECT * FROM ".$this->table1." WHERE status=1 ;";
+				$sql = "SELECT * FROM ".$this->table." WHERE status=1 ;";
 				//--------------------------------
 				$res = $this->db_exec($sql);
 				if ($res->result==true && $res->cant > 0) {
 					while ($row = $fc_assoc($res->res)){
-						$inf .= '<option value="'.base64_encode($row[$this->tid]).'">'.$row['nombre_tipo'].' - '.$row['id_int'].' - '.$row['nombre_comp'].'</option>';
+						$inf .= '<option value="'.base64_encode($row[$this->tid]).'">'.$row['nombre'].'</option>';
 					}
 					//--------------------------------
 					$fc_fre_r($res->res);
@@ -113,18 +113,7 @@
 					$inf.='</tr>';
 				$inf.='</thead>';
 				$inf.='<tbody style="width: 100%;">';
-					$sql = "SELECT u.*, CONCAT(u.nombres_u, ' ', u.apellidos_u) AS nombre_comp, tu.nombre_t FROM ".$this->table." u INNER JOIN ".$this->table1." tu ON u.".$this->tid1."=tu.".$this->tid1." WHERE ";
-						switch ($rid) {
-							case 1:
-							case 2:
-								$sql .= " u.status<>2 ";
-							break;
-							default:
-								$sql .= " u.status=1 ";
-							break;
-						}
-						//--------------------------------
-					$sql .= " ;";
+					$sql = "SELECT o.reference AS ref, c.apellidos, c.nombre AS nombre, o.total_paid_tax_excl AS total_sin, o.total_paid_tax_incl AS total_con FROM mh_orders o INNER JOIN mh_customer c ON o.id_customer=c.id_customer WHERE o.date_add BETWEEN '2025-01-01' AND '".date('Y-m-d')."';";
 					//--------------------------------
 					$res = $this->db_exec($sql);
 					if ($res->result==true && $res->cant > 0) {
@@ -141,7 +130,7 @@
 								$inf.='<td>'.$row[$this->tid].'</td>';
 								$inf.='<td>';
 									if (strlen($row['foto_u']) > 5) {
-										$inf.='<img style="max-width: 100px; max-height: 100px;" src="'.IMG.'usuarios/'.$row['foto_u'].'" />';
+										$inf.='<img style="max-width: 100px; max-height: 100px;" src="'.IMG.'mh_orders/'.$row['foto_u'].'" />';
 									}else{
 										$inf.='No imagen';
 									}
@@ -245,31 +234,7 @@
 							$inf.='<tr>';
 								$inf.='<td>'.$n.'</td>';
 								$inf.='<td>';
-									if (strlen($row['foto_u']) > 5) {
-										if ($tip==1) {
-											$inf.='<img style="max-width: 100px; max-height: 100px;" src="'.IMG.'usuarios/'.$row['foto_u'].'" />';
-										}else{
-											$imagenPath = __DIRIMG__ . 'usuarios/' . $row['foto_u'];
-											$extension = pathinfo($imagenPath, PATHINFO_EXTENSION);
-											//-------------------------------------
-											if (in_array($extension, ['svg'])) {
-												// Cargar imagen SVG
-												$svg = file_get_contents($imagenPath);
-												$inf .= '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '" style="max-width: 100px; max-height: 100px;" />';
-											} elseif (in_array($extension, ['png', 'jpg', 'jpeg'])) {
-												// Cargar imagen PNG o JPG y codificar en base64
-												$imagenData = file_get_contents($imagenPath);
-												$imagenBase64 = 'data:image/' . $extension . ';base64,' . base64_encode($imagenData);
-												$inf .= '<img src="' . $imagenBase64 . '" style="max-width: 100px; max-height: 100px;" />';
-											} else {
-												// Manejar otros tipos de archivo o extensiones aquí
-												$inf .= 'Tipo de archivo no compatible';
-											}
-											//$inf.='<img style="max-width: 100px; max-height: 100px;" src="'.__DIRIMG__.'cursos/'.$row['foto_u'].'" />';
-										}
-									}else{
-										$inf.='No imagen';
-									}
+									$inf.='No imagen';
 								$inf.='</td>';
 								$inf.='<td>'.$row['nombre_t'].'</td>';
 								$inf.='<td>'.$row['nombre_comp'].'</td>';
