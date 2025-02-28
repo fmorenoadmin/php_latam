@@ -19,16 +19,16 @@
 			private $db_pass_qas = '';
 			private $db_pass_prd = 'AQUI_TU_CONTRASEÑA';
 		//---------------------------------------
-		protected $db_type = DB_TYPE;
-		protected $db_conec = NULL;
-		protected $db_query = NULL;
-		protected $db_error = NULL;
-		protected $db_array = NULL;
-		protected $db_object = NULL;
-		protected $db_assoc = NULL;
-		protected $db_num_r = NULL;
-		protected $db_fre_r = NULL;
-		protected $db_close = NULL;
+			protected $db_type = DB_TYPE;
+			protected $db_conec = NULL;
+			protected $db_query = NULL;
+			protected $db_error = NULL;
+			protected $db_array = NULL;
+			protected $db_object = NULL;
+			protected $db_assoc = NULL;
+			protected $db_num_r = NULL;
+			protected $db_fre_r = NULL;
+			protected $db_close = NULL;
 		//---------------------------------------------------------CONST
 		public function __construct(){
 			$this->db_conec = $this->db_type.'connect';
@@ -49,9 +49,34 @@
 			$this->db_fre_r = $this->db_type.'free_result';
 			$this->db_close = $this->db_type.'close';
 		}
+		public function load_other_type($_db_type){
+			$this->db_conec = $_db_type.'connect';
+			$this->db_query = $_db_type.'query';
+			if ($_db_type == 'mysqli_') {
+				$this->db_error = $_db_type.'error';
+			} else {
+				$this->db_error = $_db_type.'last_error';
+			}
+			$this->db_array = $_db_type.'fetch_array';
+			$this->db_object = $_db_type.'fetch_object'; // Corrección aquí
+			$this->db_assoc = $_db_type.'fetch_assoc';
+			if ($_db_type == 'mysqli_') {
+				$this->db_num_r = 'num_rows';
+			}else{
+				$this->db_num_r = $_db_type.'num_rows';
+			}
+			$this->db_fre_r = $_db_type.'free_result';
+			$this->db_close = $_db_type.'close';
+		}
 		//---------------------------------------------------------CON
-			function connect($schu=null,$db='con'){
-				$fc_conec=$this->db_conec;
+			function connect($schu=null,$db='con',$_db_type=null){
+				if (is_null($_db_type)) {
+					$fc_conec=$this->db_conec;
+					$dt_type = $this->db_type;
+				}else{
+					$fc_conec=$_db_type.'connect';
+					$dt_type = $_db_type;
+				}
 				//----------------------------------
 				if (!is_null($schu)) {
 					$name = "db".strtolower($schu);
@@ -64,16 +89,17 @@
 					$user = "db_user".strtolower(SCHU);
 					$pass = "db_pass".strtolower(SCHU);
 				}
-				$_host = $this->$name;
 				//----------------------------------
 				switch ($db) {
 					case 'vac2':
+						$_host = $this->$name;
 						$_port = $this->db_port;
 						$_user = $this->$user;
 						$_pass = $this->$pass;
 						$_name = 'vac2';//nombre de otra base de datos
 					break;
 					default:
+						$_host = $this->$name;
 						$_port = $this->db_port;
 						$_user = $this->$user;
 						$_pass = $this->$pass;
@@ -81,7 +107,7 @@
 					break;
 				}
 				//----------------------------------
-				switch ($this->db_type) {
+				switch ($dt_type) {
 					case 'pg_'://conexcióna  base de datos PostgreSQL
 						$con = $fc_conec("host=".$_host." port=".$_port." dbname=".$_name." user=".$_user." password=".$_pass);
 						pg_set_client_encoding($con, "UTF8");
@@ -104,13 +130,17 @@
 				return($con);
 			}
 		//---------------------------------------------------------EXEC
-			public function db_exec($sql,$ret_res=true,$db='con'){
+			public function db_exec($sql,$ret_res=true,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();
 				$error = NULL;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//---------------------------------------------------------
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
@@ -141,13 +171,17 @@
 				//---------------------------------------------------------
 				return $data;
 			}
-			public function db_exec_sql($sql,$ret_res=true,$db='con'){
+			public function db_exec_sql($sql,$ret_res=true,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();
 				$error = NULL;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//---------------------------------------------------------
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
@@ -182,13 +216,17 @@
 				//---------------------------------------------------------
 				return $data;
 			}
-			public function db_exec_sql_array($sql,$ret_res=true,$db='con'){
+			public function db_exec_sql_array($sql,$ret_res=true,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();$datos = array();
 				$error = NULL;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//---------------------------------------------------------
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
@@ -519,13 +557,17 @@
 				return $mes_txt;
 			}
 		//---------------------------------------------------------GET
-			public function db_get_string($dt,$json,$db='con'){
+			public function db_get_string($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -569,13 +611,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_get_id($dt,$json,$db='con'){
+			public function db_get_id($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				$tipo_get = 8;//8 select por ID
 				//----------------------------
 				$er=1;
@@ -620,13 +666,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_get_camp_id_array($dt,$json,$db='con'){
+			public function db_get_camp_id_array($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $datos = array();
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -669,13 +719,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_get_all($dt,$json,$db='con'){
+			public function db_get_all($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $fila = array(); $inf = array();
 				$data->error = null;$n=0;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -729,13 +783,17 @@
 				//------------------
 				return $data;
 			}
-			public function db_get_cant($dt,$json,$db='con'){
+			public function db_get_cant($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -885,13 +943,17 @@
 				return $data;
 			}
 		//---------------------------------------------------------ADD Y EDIT
-			public function db_add($dt,$json,$db='con'){
+			public function db_add($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -925,13 +987,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_add_all($dt,$json,$db='con'){
+			public function db_add_all($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $result = array(); $fila_res = array();
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;$n=0;$r=0;
 				if(is_null($json->tname)){ $er=0; }
@@ -1002,14 +1068,18 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_add_ret($dt,$json,$db='con'){
+			public function db_add_ret($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				$data->pid = 0;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				$er=1;
 				if(is_null($json->tname)){ $er=0; }
@@ -1054,13 +1124,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_edit($dt,$json,$db='con'){
+			public function db_edit($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				switch ($json->success) {
 					case "edit":
@@ -1125,13 +1199,17 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_edit_string($dt,$json,$db='con'){
+			public function db_edit_string($dt,$json,$db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
 				//----------------------------
-				$_cc = $this->connect(SCHU,$db);
+				$_cc = $this->connect(SCHU,$db,$_db_type);
 				//----------------------------
 				switch ($json->success) {
 					case "edit":
@@ -1196,7 +1274,11 @@
 				$fc_close($_cc);
 				return $data;
 			}
-			public function db_edit_all($dt,$json,$_db='con'){
+			public function db_edit_all($dt,$json,$_db='con',$_db_type=null){
+				if (!is_null($_db_type)) {
+					$this->load_other_type($_db_type);
+				}
+				//---------------------------------------------------------
 				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $result = array(); $fila_res = array();
@@ -1212,7 +1294,7 @@
 						if (!is_null($fila[$json->t_camp])) {
 							$sql = $this->get_sql($json->tname, $fila, 2, $json->tid, $json->pid);
 							try {
-								$res = $fc_query($this->connect(SCHU,$_db),$sql) OR $data->error .= ($fc_error($this->connect(SCHU,$_db)));
+								$res = $fc_query($this->connect(SCHU,$_db,$_db_type),$sql) OR $data->error .= ($fc_error($this->connect(SCHU,$_db,$_db_type)));
 								if ($res) {
 									$result[] = array(
 										"result"	=>	true,
@@ -1260,11 +1342,11 @@
 				$data->rows = $n;
 				$data->rows_edit = $r;
 				//------------------
-				$fc_close($this->connect(SCHU,$_db));
+				$fc_close($this->connect(SCHU,$_db,$_db_type));
 				return $data;
 			}
 		//---------------------------------------------------------PREDETERMINADO
-			public function get_datos($pid,$type,$db='con'){
+			public function get_datos($pid,$type,$db='con',$_db_type=null){
 				$data = new stdClass();
 				//---------------------------------------------------------
 				switch ($type) {
@@ -1283,7 +1365,7 @@
 				}
 				//---------------------------------------------------------
 				if (!is_null($sql)) {
-					$data = $this->db_exec_sql($sql,$db);
+					$data = $this->db_exec_sql($sql,true,$db,$_db_type);
 				}
 				//---------------------------------------------------------
 				return $data;
