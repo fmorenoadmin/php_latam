@@ -4,70 +4,79 @@
 	 */
 	class database
 	{
-		//-----------------------------
+		//---------------------------------------------------------
 			private $db_prd = 'localhost';//IP SERVER prd
 			private $db_qas = 'localhost';//IP SERVER qas
 			//---------------------------------------
-			private $db_port = '';
+			private $db_port = '5432';
 			//---------------------------------------
 			private $db_name_qas = 'vac';
-			private $db_name_prd = 'AQUI_TU_NOMBRE_DATABASE';
+			private $db_name_prd = 'vac';
 			//---------------------------------------
 			private $db_user_qas = 'root';
-			private $db_user_prd = 'AQUI_TU_USUARIO';
+			private $db_user_prd = 'root';
 			//---------------------------------------
 			private $db_pass_qas = '';
-			private $db_pass_prd = 'AQUI_TU_CONTRASEÑA';
-		//---------------------------------------
+			private $db_pass_prd = '';
+		//---------------------------------------------------------
 			protected $db_type = DB_TYPE;
 			protected $db_conec = NULL;
 			protected $db_query = NULL;
 			protected $db_error = NULL;
 			protected $db_array = NULL;
+			protected $db_fetch = NULL;
 			protected $db_object = NULL;
 			protected $db_assoc = NULL;
 			protected $db_num_r = NULL;
 			protected $db_fre_r = NULL;
 			protected $db_close = NULL;
+			private $codificacion_original = 'ISO-8859-1';
+			private $codificacion_objetivo = 'UTF-8';
 		//---------------------------------------------------------CONST
-		public function __construct(){
-			$this->db_conec = $this->db_type.'connect';
-			$this->db_query = $this->db_type.'query';
-			if ($this->db_type == 'mysqli_') {
-				$this->db_error = $this->db_type.'error';
-			} else {
-				$this->db_error = $this->db_type.'last_error';
+			public function __construct(){
+				$this->db_conec = $this->db_type.'connect';
+				$this->db_query = $this->db_type.'query';
+				if ($this->db_type == 'mysqli_') {
+					$this->db_error = $this->db_type.'error';
+				} else {
+					$this->db_error = $this->db_type.'last_error';
+				}
+				if ($this->db_type == 'sqlsrv_') {
+					$this->db_fetch = $this->db_type.'fetch';
+				}
+				$this->db_array = $this->db_type.'fetch_array';
+				$this->db_object = $this->db_type.'fetch_object'; // Corrección aquí
+				$this->db_assoc = $this->db_type.'fetch_assoc';
+				if ($this->db_type == 'mysqli_') {
+					$this->db_num_r = 'num_rows';
+				}else{
+					$this->db_num_r = $this->db_type.'num_rows';
+				}
+				$this->db_fre_r = $this->db_type.'free_result';
+				$this->db_close = $this->db_type.'close';
 			}
-			$this->db_array = $this->db_type.'fetch_array';
-			$this->db_object = $this->db_type.'fetch_object'; // Corrección aquí
-			$this->db_assoc = $this->db_type.'fetch_assoc';
-			if ($this->db_type == 'mysqli_') {
-				$this->db_num_r = 'num_rows';
-			}else{
-				$this->db_num_r = $this->db_type.'num_rows';
+			public function load_other_type($_db_type){
+				$this->db_conec = $_db_type.'connect';
+				$this->db_query = $_db_type.'query';
+				if ($_db_type == 'mysqli_') {
+					$this->db_error = $_db_type.'error';
+				} else {
+					$this->db_error = $_db_type.'last_error';
+				}
+				if ($this->db_type == 'sqlsrv_') {
+					$this->db_fetch = $this->db_type.'fetch';
+				}
+				$this->db_array = $_db_type.'fetch_array';
+				$this->db_object = $_db_type.'fetch_object'; // Corrección aquí
+				$this->db_assoc = $_db_type.'fetch_assoc';
+				if ($_db_type == 'mysqli_') {
+					$this->db_num_r = 'num_rows';
+				}else{
+					$this->db_num_r = $_db_type.'num_rows';
+				}
+				$this->db_fre_r = $_db_type.'free_result';
+				$this->db_close = $_db_type.'close';
 			}
-			$this->db_fre_r = $this->db_type.'free_result';
-			$this->db_close = $this->db_type.'close';
-		}
-		public function load_other_type($_db_type){
-			$this->db_conec = $_db_type.'connect';
-			$this->db_query = $_db_type.'query';
-			if ($_db_type == 'mysqli_') {
-				$this->db_error = $_db_type.'error';
-			} else {
-				$this->db_error = $_db_type.'last_error';
-			}
-			$this->db_array = $_db_type.'fetch_array';
-			$this->db_object = $_db_type.'fetch_object'; // Corrección aquí
-			$this->db_assoc = $_db_type.'fetch_assoc';
-			if ($_db_type == 'mysqli_') {
-				$this->db_num_r = 'num_rows';
-			}else{
-				$this->db_num_r = $_db_type.'num_rows';
-			}
-			$this->db_fre_r = $_db_type.'free_result';
-			$this->db_close = $_db_type.'close';
-		}
 		//---------------------------------------------------------CON
 			function connect($schu=null,$db='con',$_db_type=null){
 				if (is_null($_db_type)) {
@@ -135,7 +144,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();
 				$error = NULL;
@@ -145,14 +154,24 @@
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
 					if ($ret_res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
+							$n=0;
+							while ($row = $fc_object($res)) {
+								$n++;
+							}
+							$data->cant = $n;
 							$data->res = $res;
 						}else{
-							$data->result = false;
-							$data->cant = 0;
-							$data->res = $res;
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
+								$data->res = $res;
+							}else{
+								$data->result = false;
+								$data->cant = 0;
+								$data->res = $res;
+							}
 						}
 					}else{
 						$data->result = true;
@@ -176,7 +195,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();
 				$error = NULL;
@@ -186,18 +205,30 @@
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
 					if ($ret_res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								foreach ($row as $key => $value) {
 									$data->$key = $value;
 								}
+								$n++;
 							}
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->cant = 0;
-							$data->res = null;
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
+								while ($row = $fc_assoc($res)) {
+									foreach ($row as $key => $value) {
+										$data->$key = $value;
+									}
+								}
+							}else{
+								$data->result = false;
+								$data->cant = 0;
+								$data->res = null;
+							}
 						}
 					}else{
 						$data->result = true;
@@ -221,7 +252,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass();$datos = array();
 				$error = NULL;
@@ -231,16 +262,26 @@
 				$res = $fc_query($_cc, $sql) OR $error = $fc_error($_cc);
 				if ($res) {
 					if ($ret_res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								$datos[] = $row;
+								$n++;
 							}
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->cant = 0;
-							$data->res = null;
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->cant = (($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res));
+								while ($row = $fc_assoc($res)) {
+									$datos[] = $row;
+								}
+							}else{
+								$data->result = false;
+								$data->cant = 0;
+								$data->res = null;
+							}
 						}
 					}else{
 						$data->result = true;
@@ -291,8 +332,8 @@
 				//-----------------------------
 				return $inf;
 			}
-			public function sum_fecha($campo,$fecha,$time){
-				if ($campo == 1 && !is_null($fecha)) {
+			public function sum_fecha($fecha,$time){
+				if (!is_null($fecha)) {
 					// Verificar si la fecha tiene el formato DD/MM/YYYY
 					$fecha_formato_dmy = DateTime::createFromFormat('d/m/Y', $fecha);
 					//-----------------------------------
@@ -562,7 +603,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -576,23 +617,35 @@
 				if($json->pid <= 0){ $er=0; }
 				//----------------------------
 				if ($er == 1) {
-					$sql = $this->get_sql($json->tname, $dt, 8, $json->tid, $json->pid);//8 select por VSLOR STRING
-					$res = $fc_query($_cc,$sql) OR $data->error = ($fc_error($_cc));
+					$sql = $this->get_sql($json->tname, $dt, 9, $json->tid, $json->pid);//9 select por VALOR STRING
+					$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 					if ($res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->mensaje = "Registro encontrado exitosamente.";
-							//----------------------------
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								foreach ($row as $key => $value) {
 									$data->$key = $value;
 								}
+								$n++;
 							}
-							//----------------------------
-							$row = null;
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->mensaje = "La repuesta está vacía.";
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->mensaje = "Registro encontrado exitosamente.";
+								//----------------------------
+								while ($row = $fc_assoc($res)) {
+									foreach ($row as $key => $value) {
+										$data->$key = $value;
+									}
+								}
+								//----------------------------
+								$row = null;
+							}else{
+								$data->result = false;
+								$data->mensaje = "La repuesta está vacía.";
+							}
 						}
 						//----------------------------
 						$fc_fre_r($res);
@@ -616,7 +669,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -632,22 +685,34 @@
 				//----------------------------
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, $tipo_get, $json->tid, $json->pid);
-					$res = $fc_query($_cc,$sql) OR $data->error = ($fc_error($_cc));
+					$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 					if ($res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->mensaje = "Registro encontrado exitosamente.";
-							//----------------------------
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								foreach ($row as $key => $value) {
 									$data->$key = $value;
 								}
+								$n++;
 							}
-							//----------------------------
-							$row = null;
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->mensaje = "La repuesta está vacía.";
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->mensaje = "Registro encontrado exitosamente.";
+								//----------------------------
+								while ($row = $fc_assoc($res)) {
+									foreach ($row as $key => $value) {
+										$data->$key = $value;
+									}
+								}
+								//----------------------------
+								$row = null;
+							}else{
+								$data->result = false;
+								$data->mensaje = "La repuesta está vacía.";
+							}
 						}
 						//----------------------------
 						$fc_fre_r($res);
@@ -671,7 +736,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $datos = array();
 				$data->error = null;
@@ -686,20 +751,30 @@
 				//----------------------------
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, 11, $json->tid, $json->pid, null, $json->adic);//8 select por ID
-					$res = $fc_query($_cc,$sql) OR $data->error = ($fc_error($_cc));
+					$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 					if ($res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->mensaje = "Registro encontrado exitosamente.";
-							//----------------------------
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								$datos[] = $row;
+								$n++;
 							}
-							//----------------------------
-							$row = null;
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->mensaje = "La repuesta está vacía.";
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->mensaje = "Registro encontrado exitosamente.";
+								//----------------------------
+								while ($row = $fc_assoc($res)) {
+									$datos[] = $row;
+								}
+								//----------------------------
+								$row = null;
+							}else{
+								$data->result = false;
+								$data->mensaje = "La repuesta está vacía.";
+							}
 						}
 						//----------------------------
 						$fc_fre_r($res);
@@ -724,7 +799,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $fila = array(); $inf = array();
 				$data->error = null;$n=0;
@@ -738,29 +813,43 @@
 				//----------------------------
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, $json->type, $json->tid, $json->pid);//5 select por ID
-					$res = $fc_query($_cc,$sql) OR $data->error = ($fc_error($_cc));
+					$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 					if ($res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->mensaje = "Registros encontrados exitosamente.";
-							//----------------------------
-							while ($row = $fc_assoc($res)) {
-								$fila = array(
+							$n=0;
+							while ($row = $fc_object($res)) {
+								$inf[] = array(
 									"id"	=>	$row[$json->tid],
 									//"name"	=>	mb_convert_encoding($row[$json->col_name], $this->codificacion_objetivo, $this->codificacion_original),
 									//"name"	=>	htmlentities($row[$json->col_name], ENT_QUOTES, 'UTF-8'),
 									"name"	=>	mb_convert_encoding($row[$json->col_name], $this->codificacion_original, $this->codificacion_objetivo),
 								);
 								//----------------------------
-								array_push($inf, $fila);
-								//----------------------------
 								$n++;
 							}
-							//----------------------------
-							$row = null;
+							$data->cant = $n;
 						}else{
-							$data->result = false;
-							$data->mensaje = "La repuesta está vacía.";
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->mensaje = "Registros encontrados exitosamente.";
+								//----------------------------
+								while ($row = $fc_assoc($res)) {
+									$inf[] = array(
+										"id"	=>	$row[$json->tid],
+										//"name"	=>	mb_convert_encoding($row[$json->col_name], $this->codificacion_objetivo, $this->codificacion_original),
+										//"name"	=>	htmlentities($row[$json->col_name], ENT_QUOTES, 'UTF-8'),
+										"name"	=>	mb_convert_encoding($row[$json->col_name], $this->codificacion_original, $this->codificacion_objetivo),
+									);
+									//----------------------------
+									$n++;
+								}
+								//----------------------------
+								$row = null;
+							}else{
+								$data->result = false;
+								$data->mensaje = "La repuesta está vacía.";
+							}
 						}
 						//----------------------------
 						$fc_fre_r($res);
@@ -788,7 +877,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -801,23 +890,35 @@
 				//----------------------------
 				if ($er == 1) {
 					$sql = "SELECT COUNT(*) AS total FROM ".$json->tname." WHERE status=1 ;";
-					$res = $fc_query($_cc,$sql) OR $data->error = ($fc_error($_cc));
+					$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 					if ($res) {
-						if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+						if ($this->db_type == 'sqlsrv_') {
 							$data->result = true;
-							$data->mensaje = "Registro encontrado exitosamente.";
-							//----------------------------
-							while ($row = $fc_assoc($res)) {
+							$n=0;
+							while ($row = $fc_object($res)) {
 								foreach ($row as $key => $value) {
 									$data->$key = $value;
 								}
+								$n++;
 							}
-							//----------------------------
-							$row = null;
+							$data->total = $n;
 						}else{
-							$data->result = false;
-							$data->total = 0;
-							$data->mensaje = "La repuesta está vacía.";
+							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+								$data->result = true;
+								$data->mensaje = "Registro encontrado exitosamente.";
+								//----------------------------
+								while ($row = $fc_assoc($res)) {
+									foreach ($row as $key => $value) {
+										$data->$key = $value;
+									}
+								}
+								//----------------------------
+								$row = null;
+							}else{
+								$data->result = false;
+								$data->total = 0;
+								$data->mensaje = "La repuesta está vacía.";
+							}
 						}
 						//----------------------------
 						$fc_fre_r($res);
@@ -948,7 +1049,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -961,7 +1062,7 @@
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, 1);
 					try {
-						$res = $fc_query($_cc,$sql) OR $data->error .= ($fc_error($_cc));
+						$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 						if ($res) {
 							$data->result = true;
 							$data->inf = $json->success;
@@ -992,7 +1093,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null; $result = array(); $fila_res = array();
 				$data->error = null;
@@ -1009,61 +1110,54 @@
 						if (!is_null($fila[$json->t_camp])) {
 							$sql = $this->get_sql($json->tname, $fila, 1);
 							try {
-								$res = $fc_query($_cc,$sql) OR $data->error .= ($fc_error($_cc));
+								$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 								if ($res) {
-									$fila_res = array(
+									$result[] = array(
 										"result"	=>	true,
 										"inf"	=>	$json->success,
 										"mensaje"	=>	"Registro agregado exitosamente.",
 									);
 									//-----------------------------
-									array_push($result, $fila_res);
-									//-----------------------------
 									$r++;
 								}else{
-									$fila_res = array(
+									$result[] = array(
 										"result"	=>	false,
 										"inf"	=>	$json->danger,
 										"mensaje"	=>	"No se logró agregar los datos.",
 									);
-									//-----------------------------
-									array_push($result, $fila_res);
 								}
 							} catch (Exception $e) {
-								$fila_res = array(
+								$result[] = array(
 									"result"	=>	false,
 									"inf"	=>	$json->danger,
 									"mensaje"	=>	"No se logró agregar, Ya existe un valor igual.",
 								);
-								//-----------------------------
-								array_push($result, $fila_res);
 							}
 						}else{
-							$fila_res = array(
+							$result[] = array(
 								"result"	=>	false,
 								"inf"	=>	$json->danger,
 								"mensaje"	=>	"El primer campo está vacío, por ello no se agregó la fila: ".$n,
 							);
-							//-----------------------------
-							array_push($result, $fila_res);
 						}
 						//----------------------------
 						$n++;
 					}
 				}else{
-					$fila_res = array(
+					$result[] = array(
 						"result"	=>	false,
 						"inf"	=>	'null',
 						"mensaje"	=>	"No existe el nombre de la tabla.",
 					);
-					//-----------------------------
-					array_push($result, $fila_res);
 				}
 				//------------------
 				//$data->sql = $sql;
 				$data->res = (($n > 1000) ? $result[0] : $result);
 				$data->rows = $n;
 				$data->rows_add = $r;
+				if ($data->rows_add > 0) {
+					$data->add_one = $result[0];
+				}
 				//------------------
 				$fc_close($_cc);
 				return $data;
@@ -1073,7 +1167,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -1087,21 +1181,33 @@
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, 1, $json->tid, $json->pid, true);
 					try {
-						$res = $fc_query($_cc,$sql) OR $data->error .= ($fc_error($_cc));
+						$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 						if ($res) {
-							if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+							if ($this->db_type == 'sqlsrv_') {
 								$data->result = true;
 								$data->inf = $json->success;
-								//----------------------------
-								while ($row = $fc_assoc($res)) {
+								$n=0;
+								while ($row = $fc_object($res)) {
 									$data->pid = $row[$json->tid];
+									$n++;
 								}
 								//----------------------------
 								$data->mensaje = "Registro agregado exitosamente.";
 							}else{
-								$data->result = false;
-								$data->inf = $json->success;
-								$data->mensaje = "Registro agregado, pero no se retorna ID.";
+								if ((($this->db_type == 'mysqli_') ? $res->$fc_num_r : $fc_num_r($res)) > 0) {
+									$data->result = true;
+									$data->inf = $json->success;
+									//----------------------------
+									while ($row = $fc_assoc($res)) {
+										$data->pid = $row[$json->tid];
+									}
+									//----------------------------
+									$data->mensaje = "Registro agregado exitosamente.";
+								}else{
+									$data->result = false;
+									$data->inf = $json->success;
+									$data->mensaje = "Registro agregado, pero no se retorna ID.";
+								}
 							}
 						}else{
 							$data->result = false;
@@ -1129,7 +1235,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -1173,7 +1279,7 @@
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, 2, $json->tid, $json->pid);
 					try {
-						$res = $fc_query($_cc,$sql) OR $data->error .= ($fc_error($_cc));
+						$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 						if ($res) {
 							$data->result = true;
 							$data->inf = $json->success;
@@ -1204,7 +1310,7 @@
 					$this->load_other_type($_db_type);
 				}
 				//---------------------------------------------------------
-				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
+				$fc_query=$this->db_query;$fc_error=$this->db_error;$fc_fecth=$this->db_fecth;$fc_array=$this->db_array;$fc_object=$this->db_object;$fc_assoc=$this->db_assoc;$fc_num_r=$this->db_num_r;$fc_fre_r=$this->db_fre_r;$fc_close=$this->db_close;
 				//---------------------------------------------------------
 				$data = new stdClass(); $sql = null;
 				$data->error = null;
@@ -1248,7 +1354,7 @@
 				if ($er == 1) {
 					$sql = $this->get_sql($json->tname, $dt, 7, $json->tid, $json->pid);
 					try {
-						$res = $fc_query($_cc,$sql) OR $data->error .= ($fc_error($_cc));
+						$res = $fc_query($_cc,$sql) OR $data->error = (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($_cc));
 						if ($res) {
 							$data->result = true;
 							$data->inf = $json->success;
@@ -1294,12 +1400,12 @@
 						if (!is_null($fila[$json->t_camp])) {
 							$sql = $this->get_sql($json->tname, $fila, 2, $json->tid, $json->pid);
 							try {
-								$res = $fc_query($this->connect(SCHU,$_db,$_db_type),$sql) OR $data->error .= ($fc_error($this->connect(SCHU,$_db,$_db_type)));
+								$res = $fc_query($this->connect(SCHU,$_db,$_db_type),$sql) OR $data->error .= (($this->db_type=='sqlsrv_') ? $fc_error() : $fc_error($this->connect(SCHU,$_db,$_db_type)));
 								if ($res) {
 									$result[] = array(
 										"result"	=>	true,
 										"inf"	=>	$json->success,
-										"mensaje"	=>	"Registro agregado exitosamente.",
+										"mensaje"	=>	"Registro editado exitosamente.",
 										"fila"	=>	$fila[$json->t_camp],
 									);
 									$r++;
@@ -1307,7 +1413,7 @@
 									$result[] = array(
 										"result"	=>	false,
 										"inf"	=>	$json->danger,
-										"mensaje"	=>	"No se logró agregar los datos.",
+										"mensaje"	=>	"No se logró editar los datos.",
 										"fila"	=>	$fila,
 									);
 								}
@@ -1315,7 +1421,7 @@
 								$result[] = array(
 									"result"	=>	false,
 									"inf"	=>	$json->danger,
-									"mensaje"	=>	"No se logró agregar, Ya existe un valor igual.",
+									"mensaje"	=>	"No se logró editar, Ya existe un valor igual.",
 									"fila"	=>	$fila,
 								);
 							}
@@ -1342,7 +1448,7 @@
 				$data->rows = $n;
 				$data->rows_edit = $r;
 				//------------------
-				$fc_close($this->connect(SCHU,$_db,$_db_type));
+				if($this->db_type=='sqlsrv_'){ $fc_close(); }else{ $fc_close($this->connect(SCHU,$_db,$_db_type)); }
 				return $data;
 			}
 		//---------------------------------------------------------PREDETERMINADO
@@ -1416,7 +1522,20 @@
 						$sql = "SELECT * FROM ".$this_table." WHERE ";
 						//-----------valores----------------
 							foreach ($dt as $key => $value) {
-								$sql .= $key."='".$value."', ";
+								switch ($key) {
+									case 'created_at':
+									case 'id_created':
+									case 'updated_at':
+									case 'id_updated':
+									case 'drop_at':
+									case 'id_drop':
+									case 'motivo_drop':
+									case 'status':
+									break;
+									default:
+										$sql .= $key."='".$value."' AND ";
+									break;
+								}
 							}
 						//-----------fin-valores------------
 						$sql = substr($sql, 0, -2);
