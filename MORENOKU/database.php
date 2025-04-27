@@ -63,8 +63,8 @@
 				} else {
 					$this->db_error = $_db_type.'last_error';
 				}
-				if ($this->db_type == 'sqlsrv_') {
-					$this->db_fetch = $this->db_type.'fetch';
+				if ($this->_db_type == 'sqlsrv_') {
+					$this->db_fetch = $this->_db_type.'fetch';
 				}
 				$this->db_array = $_db_type.'fetch_array';
 				$this->db_object = $_db_type.'fetch_object'; // Corrección aquí
